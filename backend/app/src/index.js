@@ -92,6 +92,23 @@ async function handle_advance(data) {
       });
 
       //{"method":"compress","data":"This is a Cartesi workshop with BIH"}
+    } else if (JSONpayload.method === "create_asset") {
+      // console.log("creating asset....");
+      const id = uuidv4();
+
+      const result = JSON.stringify({ id, data: JSONpayload.data});
+      const hexresult = viem.stringToHex(result);
+
+      console.log("creating asset....");
+
+      advance_req = await fetch(rollup_server + "/notice", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ payload: hexresult }),
+      });
+
     } else if (JSONpayload.method === "decompress") {
       console.log("decompressing....");
       const dataArr = compressedData.get(JSONpayload.id);
