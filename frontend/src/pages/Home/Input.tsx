@@ -22,6 +22,7 @@ import {
 import { Button, CustomInput, Card, CustomTextarea } from "../../components";
 import { useReportsQuery } from "../../generated/graphql";
 import styles from "./home.module.css";
+import { Notices } from "../Notices/Notices";
 
 interface IInputPropos {
   dappAddress: string;
@@ -423,45 +424,24 @@ export const Input: React.FC<IInputPropos> = (propos) => {
           Send
         </button>
       </div> */}
-      <div>
-        Transfer Ether <br />
-        <CustomInput
-          label="Address"
-          name="address"
-          value={transferEth.address}
-          onChange={handleTransferEthChange}
-        />
+      {/* <div>
+        Deposit Ether <br />
         <CustomInput
           label="Amount"
           name="amount"
           type="number"
-          value={transferEth.amount}
-          onChange={handleTransferEthChange}
+          value={etherAmount}
+          onChange={(e: any) => setEtherAmount(e.target.value)}
         />
-        {/* <button
+        <button
           onClick={() => depositEtherToPortal(etherAmount)}
           disabled={!rollups}
         >
           Deposit Ether
-        </button> */}
-        <button
-          onClick={() =>
-            addInput(
-              `${JSON.stringify({
-                method: "purchase_asset",
-                data: {
-                  address: "0xFfdbe43d4c855BF7e0f105c400A50857f53AB044",
-                  amount: transferEth.amount,
-                },
-              })}`
-            )
-          }
-        >
-          Transfer Ether
         </button>
         <br />
         <br />
-      </div>
+      </div> */}
       {/* <div>
         Deposit ERC20 <br />
         Address:{" "}
@@ -484,7 +464,7 @@ export const Input: React.FC<IInputPropos> = (propos) => {
         </button>
         <br />
         <br />
-      </div> */}
+      </div>
       <div>
         Transfer ERC721 <br />
         Address:{" "}
@@ -555,9 +535,12 @@ export const Input: React.FC<IInputPropos> = (propos) => {
         >
           Transfer Batch 1155
         </button>
-      </div>
+      </div> */}
       <div>
-        <h3>Assets for sale</h3>
+        <Notices
+          depositEtherToPortal={depositEtherToPortal}
+          rollups={rollups}
+        />
       </div>
     </div>
   );

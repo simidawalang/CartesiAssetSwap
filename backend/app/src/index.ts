@@ -15,6 +15,10 @@ const { Wallet } = require("./wallet");
 const erc20_contract_address = viem.getAddress(
   "0x2797a6a6D9D94633BA700b52Ad99337DdaFA3f52"
 );
+import { Ads, Router } from "./router";
+import deployments from "./rollups.json";
+import { Auctioneer } from "./auction";
+
 const erc721_contract_address = viem.getAddress(
   "0x68E3Ee84Bcb7543268D361Bb92D3bBB17e90b838"
 );
@@ -24,31 +28,18 @@ let compressedData = new Map();
 const toBinString = (bytes) =>
   bytes.reduce((str, byte) => str + byte.toString(2).padStart(8, "0"), "");
 
-const getPrimes = (lower, higher) => {
-  let primes = [];
-  console.log(lower, higher);
-
-  for (let i = lower; i <= higher; i++) {
-    var flag = 0;
-    // looping through 2 to ith for the primality test
-    for (let j = 2; j < i; j++) {
-      if (i % j == 0) {
-        flag = 1;
-        break;
-      }
-    }
-    if (flag == 0 && i != 1) {
-      console.log(i);
-      primes.push(i);
-    }
-  }
-  return primes;
-};
+const wallet = new Wallet(new Map());
+const auctioneer = new Auctioneer(wallet);
+const admap = new Map<string, Ads>();
+const router = new Router(auctioneer, wallet, admap);
 
 async function handle_advance(data) {
   console.log("Received advance request data " + JSON.stringify(data));
+
   const payload = data.payload;
   let JSONpayload = {};
+  const msg_sender = data.metadata.msg_sender;
+
   try {
     if (
       String(data.metadata.msg_sender).toLowerCase() ===
@@ -74,26 +65,18 @@ async function handle_advance(data) {
   }
   let advance_req;
   try {
-    if (JSONpayload.method === "compress") {
-      console.log("compressing....");
-      let id = uuidv4();
-      var compressed = await gzip(JSONpayload.data);
-      compressedData.set(id, compressed);
-      console.log("Compressed data is", id, compressed);
+    if (
+      msg_sender.toLowerCase() ===
+      deployments.contracts.EtherPortal.address.toLowerCase()
+    ) {
+      try {
+        return router.process("ether_deposit", payload);
+      } catch (e) {
+        return new Error_out(`failed to process ether deposit ${payload} ${e}`);
+      }
+    }
 
-      console.log("binary data is:", toBinString(compressed));
-      const result = JSON.stringify({ id: id, data: compressed });
-      const hexresult = viem.stringToHex(result);
-      advance_req = await fetch(rollup_server + "/notice", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ payload: hexresult }),
-      });
-
-      //{"method":"compress","data":"This is a Cartesi workshop with BIH"}
-    } else if (JSONpayload.method === "create_asset") {
+    if (JSONpayload.method === "create_asset") {
       console.log("minting ownership nft.....");
 
       // console.log("abi is", erc20abi);
@@ -126,7 +109,7 @@ async function handle_advance(data) {
         id,
         data: { ...JSONpayload.data, owner: data.metadata.msg_sender, voucher },
       });
-      
+
       const hexresult = viem.stringToHex(result);
 
       advance_req = await fetch(rollup_server + "/notice", {
@@ -175,24 +158,6 @@ async function handle_advance(data) {
       });
 
       //{"method":"hash","data":"5447416f-98ab-4c3f-944b-f66ea3d3c261"}
-    } else if (JSONpayload.method === "prime") {
-      console.log("getting the prime numbers");
-      const primes = getPrimes(
-        parseInt(JSONpayload.lower),
-        parseInt(JSONpayload.higher)
-      );
-      const result = JSON.stringify({ primes: primes });
-      const hexresult = viem.stringToHex(result);
-      console.log("primes are:", primes);
-      advance_req = await fetch(rollup_server + "/notice", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ payload: hexresult }),
-      });
-
-      //{"method":"prime","lower":"1500","higher":"1600"}
     } else if (JSONpayload.method === "mint") {
       console.log("minting erc721 token.....");
 
@@ -216,33 +181,6 @@ async function handle_advance(data) {
       });
       console.log("starting a voucher");
       //{"method":"mint"}
-    } else if (JSONpayload.method === "faucet") {
-      console.log("sending erc20 tokens.....");
-      if (DAPP_ADDRESS === "null") {
-        console.log("Dapp address is not set");
-        return "reject";
-      }
-      // console.log("abi is", erc20abi);
-
-      const call = viem.encodeFunctionData({
-        abi: erc20abi,
-        functionName: "transfer",
-        args: [data.metadata.msg_sender, BigInt(JSONpayload.value)],
-      });
-      let voucher = {
-        destination: erc20_contract_address, // dapp Address
-        payload: call,
-      };
-      console.log(voucher);
-      advance_req = await fetch(rollup_server + "/voucher", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(voucher),
-      });
-      console.log("starting a voucher");
-      //{"method":"faucet","value":"150000"}
     } else {
       console.log("method undefined");
       const result = JSON.stringify({

@@ -1,5 +1,10 @@
 .notices-page {
-  padding: 1.5rem 2rem;
+  /* padding: 1.5rem 2rem; */
+  margin-top: 2rem;
+}
+
+.page-title {
+  margin-bottom: 1rem;
 }
 
 .table {

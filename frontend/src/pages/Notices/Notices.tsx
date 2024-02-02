@@ -25,18 +25,16 @@ type Notice = {
   data: any;
 };
 
-export const Notices: React.FC = () => {
+export const Notices = ({ depositEtherToPortal, rollups }: any) => {
   const [result, reexecuteQuery] = useNoticesQuery();
   const { data, fetching, error } = result;
   const [myAddress, setMyAddress] = useState("");
-
 
   const [connectedWallet] = useWallets();
   const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
 
   const getMyAddress = async () => {
     const address = await provider.getSigner();
-
   };
   useEffect(() => {
     getMyAddress();
@@ -47,7 +45,7 @@ export const Notices: React.FC = () => {
 
   if (!data || !data.notices) return <p>No notices</p>;
 
-  const notices: Notice[] = data.notices.edges
+  const notices: any[] = data.notices.edges
     .map((node: any) => {
       const n = node.node;
       let inputPayload = n?.input.payload;
@@ -88,7 +86,8 @@ export const Notices: React.FC = () => {
 
   // const forceUpdate = useForceUpdate();
   return (
-    <div>
+    <div className={styles["notices-page"]}>
+      <h3 className={styles["page-title"]}>Assets for sale</h3>
       <button onClick={() => reexecuteQuery({ requestPolicy: "network-only" })}>
         Reload
       </button>
@@ -121,7 +120,19 @@ export const Notices: React.FC = () => {
               <td>{JSON.parse(n.payload).data.description}</td>
               <td>{JSON.parse(n.payload).data.price} ETH</td>
               <td>
-                <Button onClick={() => console.log("Clicked")}>Purchase</Button>
+                <div>
+                  Purchase (Deposit Ether) <br />
+                  <button
+                    onClick={() =>
+                      depositEtherToPortal(JSON.parse(n.payload).data.price)
+                    }
+                    disabled={!rollups}
+                  >
+                    Deposit Ether
+                  </button>
+                  <br />
+                  <br />
+                </div>
               </td>
             </tr>
           ))}
