@@ -25,8 +25,12 @@ type Notice = {
   data: any;
 };
 
-export const Notices = ({ depositEtherToPortal, rollups }: any) => {
-  const [result, reexecuteQuery] = useNoticesQuery();
+export const Notices = ({
+  depositEtherToPortal,
+  rollups,
+  reexecuteQuery,
+}: any) => {
+  const [result] = useNoticesQuery();
   const { data, fetching, error } = result;
   const [{ wallet }] = useConnectWallet();
 
@@ -110,9 +114,15 @@ export const Notices = ({ depositEtherToPortal, rollups }: any) => {
               <td>{JSON.parse(n.payload).data.title}</td>
               <td>{JSON.parse(n.payload).data.description}</td>
               <td>{JSON.parse(n.payload).data.price} ETH</td>
-              <td>{JSON.parse(n.payload).data.owner === wallet?.accounts[0].address ? "You" : JSON.parse(n.payload).data.owner}</td>
               <td>
-                {wallet?.accounts[0].address !== JSON.parse(n.payload).data.owner && (
+                {JSON.parse(n.payload).data.owner ===
+                wallet?.accounts[0].address
+                  ? "You"
+                  : JSON.parse(n.payload).data.owner}
+              </td>
+              <td>
+                {wallet?.accounts[0].address !==
+                  JSON.parse(n.payload).data.owner && (
                   <div>
                     <Button
                       onClick={() =>

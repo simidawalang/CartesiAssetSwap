@@ -23,6 +23,7 @@ import { Button, CustomInput, Card, CustomTextarea } from "../../components";
 import { useReportsQuery } from "../../generated/graphql";
 import styles from "./home.module.css";
 import { Notices } from "../Notices/Notices";
+import { useNoticesQuery } from "../../generated/graphql";
 
 interface IInputPropos {
   dappAddress: string;
@@ -33,7 +34,9 @@ export const Input: React.FC<IInputPropos> = (propos) => {
   const [connectedWallet] = useWallets();
   const provider = new ethers.providers.Web3Provider(connectedWallet.provider);
 
-  const [result, reexecuteQuery] = useReportsQuery();
+  // const [result, reexecuteQuery] = useReportsQuery();
+
+  const [result, reexecuteQuery] = useNoticesQuery();
 
   const sendAddress = async (str: string) => {
     if (rollups) {
@@ -57,6 +60,8 @@ export const Input: React.FC<IInputPropos> = (propos) => {
         console.log(`${e}`);
       }
     }
+    reexecuteQuery({ requestPolicy: "network-only" })
+
   };
 
   const depositErc20ToPortal = async (token: string, amount: number) => {
@@ -128,6 +133,8 @@ export const Input: React.FC<IInputPropos> = (propos) => {
       console.log(`${e}`);
     }
   };
+
+  
 
   const getPortalBalance = async (amount: number) => {
     try {
@@ -561,6 +568,7 @@ export const Input: React.FC<IInputPropos> = (propos) => {
       </div> */}
       <div>
         <Notices
+        reexecuteQuery={reexecuteQuery}
           depositEtherToPortal={depositEtherToPortal}
           rollups={rollups}
         />

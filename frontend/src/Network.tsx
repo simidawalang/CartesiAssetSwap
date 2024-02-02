@@ -13,30 +13,27 @@
 import { FC } from "react";
 import { useConnectWallet, useSetChain } from "@web3-onboard/react";
 import configFile from "./config.json";
-import {Button} from "./components";
+import { Button } from "./components";
 
 const config: any = configFile;
 
 export const Network: FC = () => {
-    const [{ wallet, connecting }, connect, disconnect] = useConnectWallet();
-    const [{ chains, connectedChain, settingChain }, setChain] = useSetChain();
+  const [{ wallet, connecting }, connect, disconnect] = useConnectWallet();
+  const [{ chains, connectedChain, settingChain }, setChain] = useSetChain();
 
-    return (
+  return (
+    <div className="nav">
+      <h1>CartesiAssetSwap</h1>
+      {!wallet && (
+        <Button onClick={() => connect()}>
+          {connecting ? "connecting" : "connect"}
+        </Button>
+      )}
+      {wallet && (
         <div>
-            <nav></nav>
-            {!wallet && <Button
-                onClick={() =>
-                    connect()
-                }
-            >
-                {connecting ? "connecting" : "connect"}
-            </Button>}
-            {wallet && (
-                <div>
-                    <label>Switch Chain</label>
-                    {settingChain ? (
-                        <span>Switching chain...</span>
-                    ) : (
+          {/* <label>Switch Chain</label> */}
+          {settingChain && <span>Switching chain...</span>}
+          {/* (
                         <select
                             onChange={({ target: { value } }) => {
                                 if (config[value] !== undefined) {
@@ -56,12 +53,10 @@ export const Network: FC = () => {
                                 );
                             })}
                         </select>
-                    )}
-                    <Button onClick={() => disconnect(wallet)}>
-                        Disconnect Wallet
-                    </Button>
-                </div>
-            )}
+                    ) */}
+          <Button onClick={() => disconnect(wallet)}>Disconnect Wallet</Button>
         </div>
-    );
+      )}
+    </div>
+  );
 };

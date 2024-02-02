@@ -5,13 +5,12 @@
 }
 
 html {
-    background: linear-gradient(to bottom right, #222638, #0b0a1d) no-repeat;
-    
+  background: linear-gradient(to bottom right, #222638, #0b0a1d) no-repeat;
 }
 
 body {
   color: #fff;
-  font-family: 'Raleway', sans-serif;
+  font-family: "Raleway", sans-serif;
 }
 
 #body {
@@ -21,8 +20,8 @@ body {
 }
 
 #root {
-    height: 100vh;
-    overflow-y: scroll;
+  height: 100vh;
+  overflow-y: scroll;
 }
 
 input,
@@ -30,4 +29,10 @@ textarea {
   background: #17182a;
   border: 1px solid #32324a;
   color: #fff;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 2rem;
 }
