@@ -16,8 +16,8 @@ import { init } from "@web3-onboard/react";
 import { useState } from "react";
 
 import { GraphQLProvider } from "./GraphQL";
-import { Notices } from "./Notices";
-import { Input } from "./Input";
+import { Notices } from "./pages/Notices/Notices";
+import { Input } from "./pages/Home/Input";
 import { Inspect } from "./Inspect";
 import { Network } from "./Network";
 import { Vouchers } from "./Vouchers";
@@ -47,17 +47,17 @@ const App: FC = () => {
         <div>
             <Network />
             <GraphQLProvider>
-                <div>
+                {/* <div>
                     Dapp Address: <input
                         type="text"
                         value={dappAddress}
                         onChange={(e) => setDappAddress(e.target.value)}
                     />
                     <br /><br />
-                </div>
-                <h2>Inspect</h2>
-                <Inspect />
-                <h2>Input</h2>
+                </div> */}
+                {/* <h2>Inspect</h2>
+                <Inspect /> */}
+                {/* <h2>Input</h2> */}
                 <Input dappAddress={dappAddress} />
                 <h2>Reports</h2>
                 <Reports />

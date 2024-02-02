@@ -1,0 +1,14 @@
+.notices-page {
+  padding: 1.5rem 2rem;
+}
+
+.table {
+  width: 100%;
+  text-align: left;
+}
+
+.table th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}

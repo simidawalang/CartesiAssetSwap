@@ -7,7 +7,7 @@
     "nan": "^2.18.0",
     "node-gzip": "^1.1.2",
     "uuid": "^9.0.1",
-    "viem": "^1.20.2"
+    "viem": "^2.7.1"
   },
   "devDependencies": {
     "esbuild": "^0.19.2"

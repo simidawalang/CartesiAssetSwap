@@ -12,13 +12,16 @@
 
 import React, { useState } from "react";
 import { ethers } from "ethers";
-import { useRollups } from "./useRollups";
+import { useRollups } from "../../useRollups";
 import { useWallets } from "@web3-onboard/react";
 import {
   IERC1155__factory,
   IERC20__factory,
   IERC721__factory,
-} from "./generated/rollups";
+} from "../../generated/rollups";
+import { Button, CustomInput, Card, CustomTextarea } from "../../components";
+import { useReportsQuery } from "../../generated/graphql";
+import styles from "./home.module.css";
 
 interface IInputPropos {
   dappAddress: string;
@@ -28,6 +31,8 @@ export const Input: React.FC<IInputPropos> = (propos) => {
   const rollups = useRollups(propos.dappAddress);
   const [connectedWallet] = useWallets();
   const provider = new ethers.providers.Web3Provider(connectedWallet.provider);
+
+  const [result, reexecuteQuery] = useReportsQuery();
 
   const sendAddress = async (str: string) => {
     if (rollups) {
@@ -336,6 +341,11 @@ export const Input: React.FC<IInputPropos> = (propos) => {
     price: "",
   });
 
+  const [transferEth, setTransferEth] = useState<any>({
+    address: "",
+    amount: "",
+  });
+
   const handleAssetDetailsChange = (e: any) => {
     const { name, value } = e.target;
 
@@ -347,28 +357,38 @@ export const Input: React.FC<IInputPropos> = (propos) => {
     });
   };
 
+  const handleTransferEthChange = (e: any) => {
+    const { name, value } = e.target;
+
+    setTransferEth((prev: any) => {
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
+  };
+
   return (
-    <div>
-      <div>
+    <div className={styles["home-page"]}>
+      {/* <div>
         Send Address (send relay dapp address) <br />
         <button onClick={() => sendAddress(input)} disabled={!rollups}>
           Send
         </button>
         <br />
         <br />
-      </div>
-      <div>
-        <h3>Create Asset</h3>
-        <label>Asset Title</label>
-        <input
+      </div> */}
+      <Card title="Register Asset" className={styles["register-card"]}>
+        <CustomInput
           name="title"
           type="text"
+          label="Asset Title"
           value={assetDetails.title}
           onChange={handleAssetDetailsChange}
         />{" "}
         <br />
-        <label>Description</label> <br />
-        <textarea
+        <CustomTextarea
+          label="Description"
           name="description"
           rows={4}
           value={assetDetails.description}
@@ -376,58 +396,73 @@ export const Input: React.FC<IInputPropos> = (propos) => {
         />
         <br />
         <label>Price</label> <br />
-        <input
+        <CustomInput
           name="price"
           type="number"
           value={assetDetails.price}
           onChange={handleAssetDetailsChange}
         />
-        <button
+        <Button
+          className={styles["card-btn"]}
           onClick={() =>
             addInput(
-              `${JSON.stringify({ method: "create_asset", data: assetDetails })}`
+              `${JSON.stringify({
+                method: "create_asset",
+                data: assetDetails,
+              })}`
             )
           }
           disabled={!rollups}
         >
-          Send
-        </button>
-        {/* <input
-          type="checkbox"
-          checked={hexInput}
-          onChange={(e) => setHexInput(!hexInput)}
-        />
-        <span>Raw Hex </span>
-        <button onClick={() => addInput(input)} disabled={!rollups}>
-          Send
-        </button>
-        <br />
-        <br /> */}
-      </div>
-      <div>
+          Register
+        </Button>
+      </Card>
+      {/* <div>
         Input <input value={input} onChange={(e) => setInput(e.target.value)} />
         <button onClick={() => addInput(input)} disabled={!rollups}>
           Send
         </button>
-      </div>
+      </div> */}
       <div>
-        Deposit Ether <br />
-        Amount:{" "}
-        <input
-          type="number"
-          value={etherAmount}
-          onChange={(e) => setEtherAmount(Number(e.target.value))}
+        Transfer Ether <br />
+        <CustomInput
+          label="Address"
+          name="address"
+          value={transferEth.address}
+          onChange={handleTransferEthChange}
         />
-        <button
+        <CustomInput
+          label="Amount"
+          name="amount"
+          type="number"
+          value={transferEth.amount}
+          onChange={handleTransferEthChange}
+        />
+        {/* <button
           onClick={() => depositEtherToPortal(etherAmount)}
           disabled={!rollups}
         >
           Deposit Ether
+        </button> */}
+        <button
+          onClick={() =>
+            addInput(
+              `${JSON.stringify({
+                method: "purchase_asset",
+                data: {
+                  address: "0xFfdbe43d4c855BF7e0f105c400A50857f53AB044",
+                  amount: transferEth.amount,
+                },
+              })}`
+            )
+          }
+        >
+          Transfer Ether
         </button>
         <br />
         <br />
       </div>
-      <div>
+      {/* <div>
         Deposit ERC20 <br />
         Address:{" "}
         <input
@@ -449,7 +484,7 @@ export const Input: React.FC<IInputPropos> = (propos) => {
         </button>
         <br />
         <br />
-      </div>
+      </div> */}
       <div>
         Transfer ERC721 <br />
         Address:{" "}
@@ -520,6 +555,9 @@ export const Input: React.FC<IInputPropos> = (propos) => {
         >
           Transfer Batch 1155
         </button>
+      </div>
+      <div>
+        <h3>Assets for sale</h3>
       </div>
     </div>
   );

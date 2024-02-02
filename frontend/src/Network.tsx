@@ -13,6 +13,7 @@
 import { FC } from "react";
 import { useConnectWallet, useSetChain } from "@web3-onboard/react";
 import configFile from "./config.json";
+import {Button} from "./components";
 
 const config: any = configFile;
 
@@ -22,13 +23,14 @@ export const Network: FC = () => {
 
     return (
         <div>
-            {!wallet && <button
+            <nav></nav>
+            {!wallet && <Button
                 onClick={() =>
                     connect()
                 }
             >
                 {connecting ? "connecting" : "connect"}
-            </button>}
+            </Button>}
             {wallet && (
                 <div>
                     <label>Switch Chain</label>
@@ -55,9 +57,9 @@ export const Network: FC = () => {
                             })}
                         </select>
                     )}
-                    <button onClick={() => disconnect(wallet)}>
+                    <Button onClick={() => disconnect(wallet)}>
                         Disconnect Wallet
-                    </button>
+                    </Button>
                 </div>
             )}
         </div>

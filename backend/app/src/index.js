@@ -11,6 +11,7 @@ console.log("HTTP rollup_server url is " + rollup_server);
 
 var erc20abi = require("./contract");
 var erc721abi = require("./erc721.json");
+const { Wallet } = require("./wallet");
 const erc20_contract_address = viem.getAddress(
   "0x2797a6a6D9D94633BA700b52Ad99337DdaFA3f52"
 );
@@ -93,13 +94,40 @@ async function handle_advance(data) {
 
       //{"method":"compress","data":"This is a Cartesi workshop with BIH"}
     } else if (JSONpayload.method === "create_asset") {
-      // console.log("creating asset....");
+      console.log("minting ownership nft.....");
+
+      // console.log("abi is", erc20abi);
+      const call = viem.encodeFunctionData({
+        abi: erc721abi,
+        functionName: "mintTo",
+        args: [data.metadata.msg_sender],
+      });
+
+      let voucher = {
+        destination: erc721_contract_address, // dapp Address
+        payload: call,
+      };
+
+      console.log(voucher);
+
+      await fetch(rollup_server + "/voucher", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(voucher),
+      });
+
+      console.log("registering asset....");
+
       const id = uuidv4();
 
-      const result = JSON.stringify({ id, data: JSONpayload.data});
+      const result = JSON.stringify({
+        id,
+        data: { ...JSONpayload.data, owner: data.metadata.msg_sender, voucher },
+      });
+      
       const hexresult = viem.stringToHex(result);
-
-      console.log("creating asset....");
 
       advance_req = await fetch(rollup_server + "/notice", {
         method: "POST",
@@ -108,7 +136,14 @@ async function handle_advance(data) {
         },
         body: JSON.stringify({ payload: hexresult }),
       });
+    } else if (JSONpayload.method === "purchase_asset") {
+      const wallet = new Wallet();
 
+      wallet.ether_transfer(
+        data.metadata.msg_sender,
+        "0xFfdbe43d4c855BF7e0f105c400A50857f53AB044",
+        "2"
+      );
     } else if (JSONpayload.method === "decompress") {
       console.log("decompressing....");
       const dataArr = compressedData.get(JSONpayload.id);
@@ -188,6 +223,7 @@ async function handle_advance(data) {
         return "reject";
       }
       // console.log("abi is", erc20abi);
+
       const call = viem.encodeFunctionData({
         abi: erc20abi,
         functionName: "transfer",

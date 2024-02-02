@@ -1,0 +1,13 @@
+.card {
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  background-color: #2d2b40;
+  border: 1px solid #32324a;
+  position: relative;
+}
+
+.card-title {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    letter-spacing: 0.5px;
+}

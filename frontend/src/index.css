@@ -1,0 +1,33 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+    background: linear-gradient(to bottom right, #222638, #0b0a1d) no-repeat;
+    
+}
+
+body {
+  color: #fff;
+  font-family: 'Raleway', sans-serif;
+}
+
+#body {
+  background: linear-gradient(to bottom right, #222638, #0b0a1d) no-repeat;
+  position: relative;
+  overflow-y: scroll;
+}
+
+#root {
+    height: 100vh;
+    overflow-y: scroll;
+}
+
+input,
+textarea {
+  background: #17182a;
+  border: 1px solid #32324a;
+  color: #fff;
+}

@@ -1,0 +1,12 @@
+.button {
+  border-radius: 4px;
+  background-color: #e56017;
+  border: 0;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  font-family: 'Raleway', sans-serif;
+}
+
+.button:hover {
+  cursor: pointer;
+}

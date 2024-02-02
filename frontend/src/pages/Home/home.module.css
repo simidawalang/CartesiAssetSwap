@@ -1,0 +1,18 @@
+.home-page {
+    padding: 1.5rem 2rem;
+}
+
+.register-card {
+    max-width: 650px;
+    display: block;
+    margin: 0 auto 2 rem;
+}
+
+.card-btn {
+    margin-top: 1rem;
+    display: block;
+    position: relative;
+    margin-left: auto;
+    width: 150px;
+}
+
