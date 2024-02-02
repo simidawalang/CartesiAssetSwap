@@ -12,7 +12,7 @@
 
 import { ethers } from "ethers";
 import React, { useEffect, useState } from "react";
-import { useWallets } from "@web3-onboard/react";
+import { useWallets, useConnectWallet } from "@web3-onboard/react";
 import { useNoticesQuery } from "../../generated/graphql";
 import { Button } from "../../components";
 import styles from "./notices.module.css";
@@ -28,17 +28,7 @@ type Notice = {
 export const Notices = ({ depositEtherToPortal, rollups }: any) => {
   const [result, reexecuteQuery] = useNoticesQuery();
   const { data, fetching, error } = result;
-  const [myAddress, setMyAddress] = useState("");
-
-  const [connectedWallet] = useWallets();
-  const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-
-  const getMyAddress = async () => {
-    const address = await provider.getSigner();
-  };
-  useEffect(() => {
-    getMyAddress();
-  }, []);
+  const [{ wallet }] = useConnectWallet();
 
   if (fetching) return <p>Loading...</p>;
   if (error) return <p>Oh no... {error.message}</p>;
@@ -94,13 +84,14 @@ export const Notices = ({ depositEtherToPortal, rollups }: any) => {
       <table className={styles.table}>
         <thead>
           <tr>
-            <th>Input Index</th>
-            <th>Notice Index</th>
+            {/* <th>Input Index</th> */}
+            <th> Index</th>
             {/* <th>Input Payload</th> */}
             {/* <th>Payload</th> */}
             <th>Title</th>
             <th>Description</th>
             <th>Price</th>
+            <th>Owner</th>
             <th></th>
           </tr>
         </thead>
@@ -112,27 +103,29 @@ export const Notices = ({ depositEtherToPortal, rollups }: any) => {
           )}
           {notices.map((n: any) => (
             <tr key={`${n.input.index}-${n.index}`}>
-              <td>{n.input.index}</td>
+              {/* <td>{n.input.index}</td> */}
               <td>{n.index}</td>
               {/* <td>{n.input.payload}</td> */}
               {/* <td>{n.payload}</td> */}
               <td>{JSON.parse(n.payload).data.title}</td>
               <td>{JSON.parse(n.payload).data.description}</td>
               <td>{JSON.parse(n.payload).data.price} ETH</td>
+              <td>{JSON.parse(n.payload).data.owner === wallet?.accounts[0].address ? "You" : JSON.parse(n.payload).data.owner}</td>
               <td>
-                <div>
-                  Purchase (Deposit Ether) <br />
-                  <button
-                    onClick={() =>
-                      depositEtherToPortal(JSON.parse(n.payload).data.price)
-                    }
-                    disabled={!rollups}
-                  >
-                    Deposit Ether
-                  </button>
-                  <br />
-                  <br />
-                </div>
+                {wallet?.accounts[0].address !== JSON.parse(n.payload).data.owner && (
+                  <div>
+                    <Button
+                      onClick={() =>
+                        depositEtherToPortal(JSON.parse(n.payload).data.price)
+                      }
+                      disabled={!rollups}
+                    >
+                      Purchase Asset (Deposit)
+                    </Button>
+                    <br />
+                    <br />
+                  </div>
+                )}
               </td>
             </tr>
           ))}

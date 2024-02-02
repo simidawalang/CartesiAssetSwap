@@ -129,6 +129,29 @@ export const Input: React.FC<IInputPropos> = (propos) => {
     }
   };
 
+  const getPortalBalance = async (amount: number) => {
+    try {
+      if (rollups && provider) {
+        const data = ethers.utils.toUtf8Bytes(`Deposited (${amount}) ether.`);
+        const txOverrides = { value: ethers.utils.parseEther(`${amount}`) };
+
+        // const tx = await ...
+        // rollups.etherPortalContract.depositEther(
+        //   propos.dappAddress,
+        //   data,
+        //   txOverrides
+        // );
+        rollups.etherPortalContract.depositEther(
+          propos.dappAddress,
+          data,
+          txOverrides
+        );
+      }
+    } catch (e) {
+      console.log(`${e}`);
+    }
+  };
+
   const transferNftToPortal = async (
     contractAddress: string,
     nftid: number
@@ -396,8 +419,8 @@ export const Input: React.FC<IInputPropos> = (propos) => {
           onChange={handleAssetDetailsChange}
         />
         <br />
-        <label>Price</label> <br />
         <CustomInput
+        label="Price (in ETH)"
           name="price"
           type="number"
           value={assetDetails.price}
